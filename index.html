@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Crystal Defense</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div id="main-menu">
+        <div class="m-glow"></div>
+        <div class="m-particles" id="mp"></div>
+        <div class="m-title">CRYSTAL DEFENSE</div>
+        <div class="m-sub">Geometric Warfare</div>
+        <div class="m-section">
+            <label>Difficulty</label>
+            <div class="diff-row">
+                <button class="diff-btn" data-diff="easy">Facet</button>
+                <button class="diff-btn sel" data-diff="normal">Prism</button>
+                <button class="diff-btn" data-diff="hard">Obsidian</button>
+            </div>
+        </div>
+        <button id="play-btn">DEPLOY</button>
+        <div class="m-controls">
+            <div class="m-hint"><span class="kbd">1-4</span> Select crystal</div>
+            <div class="m-hint"><span class="kbd">LMB</span> Place</div>
+            <div class="m-hint"><span class="kbd">RMB</span> Cancel</div>
+            <div class="m-hint"><span class="kbd">Drag</span> Orbit</div>
+        </div>
+        <div class="m-foot">Three.js Crystal Engine</div>
+    </div>
+
+    <div id="hud">
+        <!-- Top bar - liquid glass -->
+        <div id="hud-top">
+            <div class="hud-glass-shine"></div>
+            <div class="hg hg-left">
+                <div class="hs" id="hud-gold">
+                    <div class="hs-icon gold-icon"><svg viewBox="0 0 24 24" width="16" height="16"><polygon points="12,2 22,12 12,22 2,12" fill="currentColor"/></svg></div>
+                    <div class="hs-body"><div class="hs-label">GOLD</div><div class="vl">120</div></div>
+                    <div class="hs-rate" id="gold-rate">+0/s</div>
+                </div>
+                <div class="hs" id="hud-lives">
+                    <div class="hs-icon lives-icon"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/></svg></div>
+                    <div class="hs-body"><div class="hs-label">LIVES</div><div class="vl">20</div></div>
+                    <div class="lives-pips" id="lives-pips"></div>
+                </div>
+            </div>
+            <div class="hg hg-center">
+                <div class="hs hs-wave" id="hud-wave">
+                    <div class="wave-hex"><span class="vl">0</span></div>
+                    <div class="hs-body"><div class="hs-label">WAVE</div><div class="wave-sub" id="wave-sub">Waiting</div></div>
+                </div>
+            </div>
+            <div class="hg hg-right">
+                <div class="hs" id="hud-kills">
+                    <div class="hs-icon kills-icon"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/></svg></div>
+                    <div class="hs-body"><div class="hs-label">KILLS</div><div class="vl">0</div></div>
+                </div>
+                <div class="hs" id="hud-dps">
+                    <div class="hs-icon dps-icon"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M13 2.05v2.02c3.95.49 7 3.85 7 7.93 0 1.45-.39 2.81-1.06 3.98l1.73 1C21.54 15.19 22 13.15 22 11c0-4.97-3.58-9.12-8.31-9.95zM12 19c-3.87 0-7-3.13-7-7 0-3.53 2.61-6.43 6-6.92V3.03C5.06 3.56 2 7.13 2 11.5c0 5.25 4.25 9.5 9.5 9.5 2.85 0 5.4-1.26 7.14-3.25l-1.44-1.44C15.73 17.96 13.98 19 12 19z" fill="currentColor"/></svg></div>
+                    <div class="hs-body"><div class="hs-label">DPS</div><div class="vl dv">0</div></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wave progress -->
+        <div id="wpw"><div id="wpb"></div><div id="wp-glow"></div></div>
+        <div id="winfo"></div>
+
+        <!-- Speed control -->
+        <div id="speed-ctl">
+            <div class="speed-label">SPEED</div>
+            <button class="sb act" data-speed="1">1x</button>
+            <button class="sb" data-speed="2">2x</button>
+            <button class="sb" data-speed="4">4x</button>
+            <button class="sb" data-speed="6">6x</button>
+        </div>
+        <div id="auto-wave-ctl">
+            <label class="aw-label"><input type="checkbox" id="auto-wave-cb"><span class="aw-check"></span> AUTO</label>
+        </div>
+
+        <!-- Stats sidebar -->
+        <div id="stats-side">
+            <div class="stat-card" id="tc-d">
+                <div class="stat-icon"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" fill="none" stroke-width="2"/></svg></div>
+                <div class="stat-info"><div class="stat-label">TOWERS</div><div class="tv">0</div></div>
+            </div>
+            <div class="stat-card" id="tower-breakdown">
+                <div class="tb-row" data-type="shard"><span class="tb-dot" style="background:#5588ff"></span><span class="tb-name">Shard</span><span class="tb-count">0</span></div>
+                <div class="tb-row" data-type="spire"><span class="tb-dot" style="background:#bb66ff"></span><span class="tb-name">Spire</span><span class="tb-count">0</span></div>
+                <div class="tb-row" data-type="frost"><span class="tb-dot" style="background:#44ddff"></span><span class="tb-name">Frost</span><span class="tb-count">0</span></div>
+                <div class="tb-row" data-type="monolith"><span class="tb-dot" style="background:#ffbb44"></span><span class="tb-name">Mono</span><span class="tb-count">0</span></div>
+            </div>
+        </div>
+
+        <!-- Tower panel - liquid glass -->
+        <div id="tower-panel">
+            <div class="tp-glass-shine"></div>
+            <button class="tb" data-tower="shard" data-cost="50" style="--tw-color:#5588ff">
+                <span class="tk">1</span>
+                <div class="tb-glow" style="--tw-color:#5588ff"></div>
+                <div class="ti"><svg viewBox="0 0 40 40" width="28" height="28"><polygon points="20,4 36,20 20,36 4,20" fill="none" stroke="#7799ff" stroke-width="2"/><polygon points="20,10 30,20 20,30 10,20" fill="#7799ff" opacity="0.3"/></svg></div>
+                <div class="tn">Shard</div>
+                <div class="tc"><svg viewBox="0 0 12 12" width="8" height="8"><polygon points="6,1 11,6 6,11 1,6" fill="#bb88ff"/></svg> 50</div>
+                <div class="tt">
+                    <div class="tt-header"><span class="tt-icon" style="color:#7799ff">&#9670;</span> SHARD</div>
+                    <div class="tt-desc">Fast crystal beam with critical strikes</div>
+                    <div class="tt-stats">
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M8 1l2 5h5l-4 3.5 1.5 5.5L8 11.5 3.5 15 5 9.5 1 6h5z" fill="#ff6b6b"/></svg> DMG</span><div class="tt-bar"><div class="tt-fill" style="width:13%;background:#ff6b6b"></div></div><span class="tv">8</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="6" fill="none" stroke="#66d9ef" stroke-width="1.5"/><path d="M8 3v5l3 3" fill="none" stroke="#66d9ef" stroke-width="1.5"/></svg> RATE</span><div class="tt-bar"><div class="tt-fill" style="width:66%;background:#66d9ef"></div></div><span class="tv">1.0/s</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="5" fill="none" stroke="#a6e22e" stroke-width="1" stroke-dasharray="2 2"/><circle cx="8" cy="8" r="1.5" fill="#a6e22e"/></svg> RNG</span><div class="tt-bar"><div class="tt-fill" style="width:37%;background:#a6e22e"></div></div><span class="tv">4.5</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><polygon points="8,1 10,6 15,6 11,9.5 12.5,15 8,11.5 3.5,15 5,9.5 1,6 6,6" fill="none" stroke="#ff4466" stroke-width="1.2"/></svg> CRIT</span><div class="tt-bar"><div class="tt-fill" style="width:20%;background:#ff4466"></div></div><span class="tv tt-crit">20%</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M2 14L8 2l6 12" fill="none" stroke="#ff9955" stroke-width="1.5"/></svg> DPS</span><span class="tv tt-dps">9.6</span></div>
+                    </div>
+                    <div class="tt-special">Precision &bull; Critical Strikes &bull; Cheap</div>
+                </div>
+            </button>
+            <button class="tb" data-tower="spire" data-cost="100">
+                <span class="tk">2</span>
+                <div class="tb-glow" style="--tw-color:#bb66ff"></div>
+                <div class="ti"><svg viewBox="0 0 40 40" width="28" height="28"><polygon points="20,2 26,16 38,20 26,24 20,38 14,24 2,20 14,16" fill="none" stroke="#cc55ff" stroke-width="1.5"/><polygon points="20,10 24,18 32,20 24,22 20,30 16,22 8,20 16,18" fill="#cc55ff" opacity="0.25"/></svg></div>
+                <div class="tn">Spire</div>
+                <div class="tc"><svg viewBox="0 0 12 12" width="8" height="8"><polygon points="6,1 11,6 6,11 1,6" fill="#bb88ff"/></svg> 100</div>
+                <div class="tt">
+                    <div class="tt-header"><span class="tt-icon" style="color:#cc55ff">&#9672;</span> SPIRE</div>
+                    <div class="tt-desc">Long-range high-damage sniper crystal</div>
+                    <div class="tt-stats">
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M8 1l2 5h5l-4 3.5 1.5 5.5L8 11.5 3.5 15 5 9.5 1 6h5z" fill="#ff6b6b"/></svg> DMG</span><div class="tt-bar"><div class="tt-fill" style="width:58%;background:#ff6b6b"></div></div><span class="tv">35</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="6" fill="none" stroke="#66d9ef" stroke-width="1.5"/><path d="M8 3v5l3 3" fill="none" stroke="#66d9ef" stroke-width="1.5"/></svg> RATE</span><div class="tt-bar"><div class="tt-fill" style="width:26%;background:#66d9ef"></div></div><span class="tv">0.4/s</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="5" fill="none" stroke="#a6e22e" stroke-width="1" stroke-dasharray="2 2"/><circle cx="8" cy="8" r="1.5" fill="#a6e22e"/></svg> RNG</span><div class="tt-bar"><div class="tt-fill" style="width:75%;background:#a6e22e"></div></div><span class="tv">9</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M2 14L8 2l6 12" fill="none" stroke="#ff9955" stroke-width="1.5"/></svg> DPS</span><span class="tv tt-dps">14.0</span></div>
+                    </div>
+                    <div class="tt-special">Sniper &bull; High DMG &bull; Slow</div>
+                </div>
+            </button>
+            <button class="tb" data-tower="frost" data-cost="60">
+                <span class="tk">3</span>
+                <div class="tb-glow" style="--tw-color:#44ddff"></div>
+                <div class="ti"><svg viewBox="0 0 40 40" width="28" height="28"><line x1="20" y1="4" x2="20" y2="36" stroke="#44ddff" stroke-width="1.5"/><line x1="4" y1="20" x2="36" y2="20" stroke="#44ddff" stroke-width="1.5"/><line x1="8" y1="8" x2="32" y2="32" stroke="#44ddff" stroke-width="1" opacity="0.6"/><line x1="32" y1="8" x2="8" y2="32" stroke="#44ddff" stroke-width="1" opacity="0.6"/><circle cx="20" cy="20" r="4" fill="#44ddff" opacity="0.3"/></svg></div>
+                <div class="tn">Frost</div>
+                <div class="tc"><svg viewBox="0 0 12 12" width="8" height="8"><polygon points="6,1 11,6 6,11 1,6" fill="#bb88ff"/></svg> 60</div>
+                <div class="tt">
+                    <div class="tt-header"><span class="tt-icon" style="color:#44ddff">&#10052;</span> FROST</div>
+                    <div class="tt-desc">Rapid-fire frost beam that slows enemies</div>
+                    <div class="tt-stats">
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M8 1l2 5h5l-4 3.5 1.5 5.5L8 11.5 3.5 15 5 9.5 1 6h5z" fill="#ff6b6b"/></svg> DMG</span><div class="tt-bar"><div class="tt-fill" style="width:6%;background:#ff6b6b"></div></div><span class="tv">4</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="6" fill="none" stroke="#66d9ef" stroke-width="1.5"/><path d="M8 3v5l3 3" fill="none" stroke="#66d9ef" stroke-width="1.5"/></svg> RATE</span><div class="tt-bar"><div class="tt-fill" style="width:93%;background:#66d9ef"></div></div><span class="tv">1.4/s</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M8 2v12M2 8h12M4 4l8 8M12 4l-8 8" stroke="#44ddff" stroke-width="1" fill="none"/></svg> SLOW</span><div class="tt-bar"><div class="tt-fill" style="width:35%;background:#44ddff"></div></div><span class="tv">35%</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M2 14L8 2l6 12" fill="none" stroke="#ff9955" stroke-width="1.5"/></svg> DPS</span><span class="tv tt-dps">5.6</span></div>
+                    </div>
+                    <div class="tt-special">Utility &bull; Crowd Control &bull; Fast</div>
+                </div>
+            </button>
+            <button class="tb" data-tower="monolith" data-cost="125">
+                <span class="tk">4</span>
+                <div class="tb-glow" style="--tw-color:#ffbb44"></div>
+                <div class="ti"><svg viewBox="0 0 40 40" width="28" height="28"><rect x="12" y="6" width="16" height="28" rx="2" fill="none" stroke="#ffaa44" stroke-width="1.5"/><rect x="16" y="12" width="8" height="16" fill="#ffaa44" opacity="0.25"/><circle cx="20" cy="20" r="3" fill="#ffaa44" opacity="0.5"/></svg></div>
+                <div class="tn">Monolith</div>
+                <div class="tc"><svg viewBox="0 0 12 12" width="8" height="8"><polygon points="6,1 11,6 6,11 1,6" fill="#bb88ff"/></svg> 125</div>
+                <div class="tt">
+                    <div class="tt-header"><span class="tt-icon" style="color:#ffaa44">&#11045;</span> MONOLITH</div>
+                    <div class="tt-desc">Devastating area-of-effect explosion</div>
+                    <div class="tt-stats">
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M8 1l2 5h5l-4 3.5 1.5 5.5L8 11.5 3.5 15 5 9.5 1 6h5z" fill="#ff6b6b"/></svg> DMG</span><div class="tt-bar"><div class="tt-fill" style="width:46%;background:#ff6b6b"></div></div><span class="tv">28</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="6" fill="none" stroke="#66d9ef" stroke-width="1.5"/><path d="M8 3v5l3 3" fill="none" stroke="#66d9ef" stroke-width="1.5"/></svg> RATE</span><div class="tt-bar"><div class="tt-fill" style="width:26%;background:#66d9ef"></div></div><span class="tv">0.4/s</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><circle cx="8" cy="8" r="5" fill="none" stroke="#ffbb44" stroke-width="1"/><circle cx="8" cy="8" r="2" fill="#ffbb44" opacity=".5"/></svg> AOE</span><div class="tt-bar"><div class="tt-fill" style="width:36%;background:#ffbb44"></div></div><span class="tv">1.8</span></div>
+                        <div class="tt-stat"><span class="tl"><svg viewBox="0 0 16 16" width="10" height="10"><path d="M2 14L8 2l6 12" fill="none" stroke="#ff9955" stroke-width="1.5"/></svg> DPS</span><span class="tv tt-dps">11.2</span></div>
+                    </div>
+                    <div class="tt-special">AOE &bull; Devastating &bull; Expensive</div>
+                </div>
+            </button>
+        </div>
+
+        <button id="wave-btn" class="hidden">START WAVE 1</button>
+        <div id="wave-banner"></div>
+
+        <!-- Upgrade panel -->
+        <div id="upgrade-panel" class="hidden">
+            <div class="up-header">
+                <span class="up-icon"></span>
+                <span class="up-name"></span>
+                <span class="up-level"></span>
+            </div>
+            <div class="up-stars"><span></span><span></span><span></span></div>
+            <div class="up-stats"></div>
+            <div class="up-actions">
+                <button id="upgrade-btn"><span class="up-btn-label">UPGRADE</span> <span id="up-cost"></span></button>
+                <button id="sell-btn">SELL <span id="sell-value"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameover">
+        <h1>SHATTERED</h1>
+        <div class="gs">
+            <div><div class="gl">Waves</div><div class="gv" id="fw">0</div></div>
+            <div><div class="gl">Kills</div><div class="gv" id="fk">0</div></div>
+            <div><div class="gl">Towers</div><div class="gv" id="ft">0</div></div>
+        </div>
+        <button id="restart-btn">REFORGE</button>
+    </div>
+
+    <script type="importmap">
+    {"imports":{
+        "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }}
+    </script>
+    <script>
+        const mp=document.getElementById('mp');
+        for(let i=0;i<18;i++){const s=document.createElement('span');const sz=3+Math.random()*6;
+        s.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;animation-duration:${9+Math.random()*15}s;animation-delay:${Math.random()*8}s`;
+        mp.appendChild(s)}
+    </script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>
